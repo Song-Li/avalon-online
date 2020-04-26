@@ -74,9 +74,12 @@ var gameInfoFilter = function(game, playerId){
         //characters not known to anyone
         playr.role = 'unknown';
         delete playr.isGood;
-      }else if(playr.role === 'assassin' || playr.role === 'villain'){
+      }else if(!roleIsGood[playr.role]){
         //characters known to merlin or evil
-        if(ownRole === 'merlin' || ownRole === 'mordred' || ownRole === 'assassin' || ownRole === 'villain'){
+        if (ownRole === 'percival' && playr.role === 'morgana') {
+          playr.role = 'merlin or morgana';
+          delete playr.isGood;
+        }else if ((!roleIsGood[ownRole] || ownRole === 'merlin') && ownRole !== 'mordred'){
           playr.role = 'evil';
         }else{
           playr.role = 'unknown';
@@ -86,6 +89,9 @@ var gameInfoFilter = function(game, playerId){
         //character known to percival
         if(ownRole !== 'percival'){
           playr.role = 'unknown';
+          delete playr.isGood;
+        } else {
+          playr.role = 'merlin or morgana';
           delete playr.isGood;
         }
       }else if(playr.role === 'mordred'){
@@ -120,7 +126,14 @@ exports.statusLogger = function(game){
 };
 
 var shuffleRoles = function(num){
-  var roles = ['merlin', 'mordred', 'percival', 'assassin', 'warrior', 'warrior', 'villain', 'warrior', 'warrior', 'villain'];
+  var roles = ['merlin', 'morgana', 'percival', 'assassin', 'warrior', 'warrior'];
+  //var base_roles = ['梅林', '莫甘娜', '派西维尔', '爪牙', '刺客', '忠臣'];
+  if (num == 7) {
+    roles.push("mordred");
+  }else if(num == 8) {
+    roles.push("villain");
+    roles.push("warrior");
+  }
   // var roles = [1,2,3,4,5,5,6,5,5,6];
   var o = roles.slice(0, num);
   for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
@@ -135,6 +148,7 @@ var shufflePositions = function(num){
 
 var roleIsGood = {
   'merlin': true,
+  'morgana': false,
   'mordred': false,
   'percival': true,
   'assassin': false,
@@ -144,6 +158,12 @@ var roleIsGood = {
 
 
 /*
+  '梅林': true,
+  '莫甘娜': false,
+  '派西维尔': true,
+  '爪牙': false, 
+  '刺客': false,
+  '忠臣': true
 1: 'merlin'
 2: 'mordred'
 3: 'percival'
